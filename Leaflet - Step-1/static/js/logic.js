@@ -33,26 +33,6 @@ function createMap(earthquakes) {
         collapsed: false
     }).addTo(myMap);
 
-    // Create a legend to display information about earthquake magnitudes
-    var legend = L.control({ position: 'bottomright' });
-
-    legend.onAdd = function(myMap) {
-
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 1, 2, 3, 4, 5],
-            labels = [];
-
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + markerColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-
-        return div;
-    };
-    legend.addTo(myMap)
-
 }
 
 // Import url from website and make it a variable
@@ -65,11 +45,11 @@ var earthquakesurl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/
 d3.json(earthquakesurl, function(data) {
     createFeatures(data.features);
 
-    var legend = L.control({ position: 'bottomright' });
+    var legend = L.control({ position: "bottomright" });
 
     legend.onAdd = function() {
 
-        var div = L.DomUtil.create('div', 'info legend');
+        var div = L.DomUtil.create("div", "info legend");
         grades = [1, 2, 3, 4, 5];
         colors = ["#90ee90", "green", "yellow", "orange", "red", "#5c0003"];
 
