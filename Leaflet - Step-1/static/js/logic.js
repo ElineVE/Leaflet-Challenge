@@ -15,7 +15,7 @@ var legend = L.control({ position: 'bottomright' });
 legend.onAdd = function() {
 
     var div = L.DomUtil.create('div', 'info legend'),
-        grades = [1, 2, 3, 4, 5],
+        grades = [0, 1, 2, 3, 4, 5],
         labels = [];
 
     // Looping through intervals, generating labels with colored square for each interval
