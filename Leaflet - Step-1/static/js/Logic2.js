@@ -1,4 +1,4 @@
-// Define Map
+//  Define Map
 
 function createMap(earthquakes) {
 
@@ -13,79 +13,16 @@ function createMap(earthquakes) {
 
 
     var myMap = L.map("map", {
-        center: [
-            40.75, -111.87
-        ],
+        center: [40.75, -111.87],
         zoom: 2,
         layers: [streetmap, earthquakes]
     });
-
-    // var baseMaps = {
-    //     "Light": lightmap,
-    //     "Dark": darkmap
-    // };
-
-    // var overlayMaps = {
-    //     Earthquakes: earthquakes
-    // };
 
     L.control.layers(baseMaps, overlayMaps, {
         collapsed: false
     }).addTo(myMap);
 
-    // Create a legend to display information about earthquake magnitudes
-    var legend = L.control({ position: 'bottomright' });
-
-    legend.onAdd = function(myMap) {
-
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 1, 2, 3, 4, 5],
-            labels = [];
-
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + markerColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-
-        return div;
-    };
-    legend.addTo(myMap)
-
 }
-
-// Import url from website and make it a variable
-
-var earthquakesurl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
-
-
-// GET request on url
-
-d3.json(earthquakesurl, function(data) {
-    createFeatures(data.features);
-
-    var legend = L.control({ position: 'bottomright' });
-
-    legend.onAdd = function() {
-
-        var div = L.DomUtil.create('div', 'info legend');
-        grades = [1, 2, 3, 4, 5];
-        colors = ["#90ee90", "green", "yellow", "orange", "red", "#5c0003"];
-
-        // Looping through intervals, generating labels with colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                "<i style='background: " + colors[i] + "'></i> " +
-                grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
-        }
-        return div;
-    };
-
-    legend.addTo(myMap);
-
-});
-
 
 // Create a first layer for map: markers
 
@@ -128,3 +65,56 @@ function createFeatures(earthquakeData) {
     });
     createMap(earthquakes);
 };
+
+
+
+
+
+
+// Here we make an AJAX call that retrieves our earthquake geoJSON data.
+d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson", function(data) {
+    // Here we add a GeoJSON layer to the map once the file is loaded.
+    L.geoJson(data, {
+        // We turn each feature into a circleMarker on the map.
+        pointToLayer: function(feature, latlng) {
+            return L.circleMarker(latlng);
+        },
+        // We set the style for each circleMarker using our styleInfo function.
+        style: styleInfo,
+        // We create a popup for each marker to display the magnitude and location of the earthquake after the marker has been created and styled
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+        }
+    }).addTo(map);
+
+    // Here we create a legend control object.
+    var legend = L.control({
+        position: "bottomright"
+    });
+
+    // Then add all the details for the legend
+    legend.onAdd = function() {
+        var div = L.DomUtil.create("div", "info legend");
+
+        var grades = [0, 1, 2, 3, 4, 5];
+        var colors = [
+            "#98ee00",
+            "#d4ee00",
+            "#eecc00",
+            "#ee9c00",
+            "#ea822c",
+            "#ea2c2c"
+        ];
+
+        // Looping through our intervals to generate a label with a colored square for each interval.
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                "<i style='background: " + colors[i] + "'></i> " +
+                grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+        }
+        return div;
+    };
+
+    // Finally, we our legend to the map.
+    legend.addTo(map);
+});
